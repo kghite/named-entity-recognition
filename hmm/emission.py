@@ -25,4 +25,4 @@ training_input = np.array([[1, 2, 3], [2, 3, 4], [5, 6, 7], [3, 6, 7]])
 training_output = ["LOC", "NONE", "NONE", "NONE"]
 
 loc_emitter.train(training_input, training_output)
-print loc_emitter.emit(np.array([[2, 3, 1]]))
+print loc_emitter.emit(np.array([[2, 3, 30]]))
