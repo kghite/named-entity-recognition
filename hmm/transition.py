@@ -45,5 +45,7 @@ class Transition():
 
         return transitions
 
+'''
 t = Transition("eng.train")
 print t.load_or_calculate()
+'''
