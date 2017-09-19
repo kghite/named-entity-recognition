@@ -1,7 +1,11 @@
 import gensim
 
-print "Loading Model"
-word_vectors = gensim.models.KeyedVectors.load_word2vec_format('GoogleNews-vectors-negative300.bin', binary=True)
+class WordVectors():
+    def load_wordvectors(self):
+        return gensim.models.KeyedVectors.load_word2vec_format('../GoogleNews-vectors-negative300.bin', binary=True)
 
-print "Model Loaded"
-print word_vectors["queen"]
+'''
+w = WordVectors()
+v = w.load_wordvectors()
+print len(v["computer"].tolist())
+'''
