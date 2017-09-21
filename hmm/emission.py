@@ -34,17 +34,14 @@ class Emitter():
     def train(self):
         print "Getting training data"
         X_train, Y_train = self.generate_training_data()
-        print "Fitting Models"
+        print "Fitting Model"
         count = 1
-        self.models = []
         for key in self.symbol_indices.keys():
-            print "Model: {} of {}".format(count, len(self.symbol_indices.keys()))
-            Y_for_class = Y_train[self.symbol_indices[key]]
+            print "Fitting model {} of {}".format(count, len(self.symbol_indices.keys()))
             model = SVC(probability=True)
-            model = model.fit(X_train, Y_for_class)
-            self.models.append(model)
-            count += 1
-        print "Successfully fit models"
+            model = model.fit(X_train, Y_train[:,self.symbol_indices[key]])
+            self.models[key] = model
+        print "Successfully fit model"
         pickle.dump(self.models, open(self.dataset + ".model.pickle", "wb"))
         pickle.dump(self.symbol_indices, open(self.dataset + "symbols.pickle", "wb"))
 
@@ -67,7 +64,7 @@ class Emitter():
                     X.append([0]*300)
                     Y.append(self.convert_symbol_to_matrix(word.tag))
         X = np.array(X)
-        Y = np.array(Y).T
+        Y = np.array(Y)
         return X, Y
 
     def enumerate_symbols(self, lines):
@@ -76,8 +73,7 @@ class Emitter():
             for word in line:
                 tags[word.tag] = 1
         keys = tags.keys()
-        self.symbol_indices = {keys[i]: i+1 for i in range(len(tags))}
-        self.symbol_indices["<START>"] = 0
+        self.symbol_indices = {keys[i]: i for i in range(len(tags))}
 
     def emit(self, word_data):
         if self.model is None:
