@@ -2,6 +2,8 @@ import sys
 import pickle
 import os.path
 import numpy as np
+from sklearn.ensemble import BaggingClassifier
+from sklearn.multiclass import OneVsRestClassifier
 from sklearn.svm import SVC
 
 sys.path.insert(0, '../')
@@ -27,15 +29,26 @@ class Emitter():
         else:
             self.train()
 
+    def generate_or_load_training_data(self):
+        if os.path.isfile(self.dataset + ".training") and os.path.isfile(self.dataset + ".symbols.pickle"):
+            self.symbol_indices = pickle.load(open(self.dataset + ".symbols.pickle", "rb"))
+            training_data = pickle.load(open(self.dataset + ".training", "rb"))
+            return training_data["X"], training_data["Y"]
+        else:
+            X, Y = self.generate_training_data()
+            training_data = {"X": X, "Y":Y}
+            pickle.dump(training_data, open(self.dataset + ".training", "wb"))
+            return X, Y
+
     def train(self):
         print "Getting training data"
-        X_train, Y_train = self.generate_training_data()
+        X_train, Y_train = self.generate_or_load_training_data()
         print "Fitting Model"
-        model = SVC(probability=True)
+        n_estimators = 35
+        model = OneVsRestClassifier(BaggingClassifier(SVC(probability=True, verbose=True), max_samples=1.0 / n_estimators, n_estimators=n_estimators, n_jobs=2))
         self.model = model.fit(X_train, Y_train)
         print "Successfully fit model"
         pickle.dump(self.model, open(self.dataset + ".model.pickle", "wb"))
-        pickle.dump(self.symbol_indices, open(self.dataset + ".symbols.pickle", "wb"))
 
     def generate_training_data(self):
         r = Reader(self.dataset)
@@ -66,6 +79,7 @@ class Emitter():
                 tags[word.tag] = 1
         keys = tags.keys()
         self.symbol_indices = {keys[i]: i for i in range(len(tags))}
+        pickle.dump(self.symbol_indices, open(self.dataset + ".symbols.pickle", "wb"))
 
     def emit(self, word_data):
         if self.model is None:
