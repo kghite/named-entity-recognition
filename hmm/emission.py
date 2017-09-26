@@ -13,21 +13,17 @@ class Emitter():
     def __init__(self, dataset):
         self.dataset = dataset
         self.symbol_indices = None
-        self.models = None
+        self.model = None
 
     def convert_symbol_to_matrix(self, symbol):
         if self.symbol_indices is None:
             raise Exception("Model has not been trained")
-        matrix = [0] * len(self.symbol_indices.keys())
-        index = self.symbol_indices.get(symbol, -1)
-        if index >= 0 and index < len(matrix):
-            matrix[index] = 1
-        return matrix
+        return self.symbol_indices.get(symbol, -1) + 1
 
     def load_or_calculate(self):
         if os.path.isfile(self.dataset + ".model.pickle") and os.path.isfile(self.dataset + ".symbols.pickle"):
-            self.models = pickle.load(open(self.dataset + ".model.pickle", "rb"))
-            self.symbol_indices = pickle.load(open(self.dataset + "symbols.pickle", "wb"))
+            self.model = pickle.load(open(self.dataset + ".model.pickle", "rb"))
+            self.symbol_indices = pickle.load(open(self.dataset + ".symbols.pickle", "rb"))
         else:
             self.train()
 
@@ -35,15 +31,11 @@ class Emitter():
         print "Getting training data"
         X_train, Y_train = self.generate_training_data()
         print "Fitting Model"
-        count = 1
-        for key in self.symbol_indices.keys():
-            print "Fitting model {} of {}".format(count, len(self.symbol_indices.keys()))
-            model = SVC(probability=True)
-            model = model.fit(X_train, Y_train[:,self.symbol_indices[key]])
-            self.models[key] = model
+        model = SVC(probability=True)
+        self.model = model.fit(X_train, Y_train)
         print "Successfully fit model"
-        pickle.dump(self.models, open(self.dataset + ".model.pickle", "wb"))
-        pickle.dump(self.symbol_indices, open(self.dataset + "symbols.pickle", "wb"))
+        pickle.dump(self.model, open(self.dataset + ".model.pickle", "wb"))
+        pickle.dump(self.symbol_indices, open(self.dataset + ".symbols.pickle", "wb"))
 
     def generate_training_data(self):
         r = Reader(self.dataset)
@@ -81,6 +73,9 @@ class Emitter():
             self.load_or_calculate()
         classes = self.model.predict_proba(word_data)[0]
         return {key: classes[self.symbol_indices[key]] for key in self.symbol_indices.keys()}
-
+        
 emitter = Emitter("eng.train")
-emitter.train()
+#emitter.train()
+w = WordVectors()
+vec = w.load_wordvectors()
+print emitter.emit([vec["Massachusetts"]])
