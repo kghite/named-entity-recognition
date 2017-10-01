@@ -30,14 +30,14 @@ class Emitter():
             self.train()
 
     def generate_or_load_training_data(self):
-        if os.path.isfile(self.dataset + ".training") and os.path.isfile(self.dataset + ".symbols.pickle"):
+        if os.path.isfile(self.dataset + ".training.pickle") and os.path.isfile(self.dataset + ".symbols.pickle"):
             self.symbol_indices = pickle.load(open(self.dataset + ".symbols.pickle", "rb"))
-            training_data = pickle.load(open(self.dataset + ".training", "rb"))
+            training_data = pickle.load(open(self.dataset + ".training.pickle", "rb"))
             return training_data["X"], training_data["Y"]
         else:
             X, Y = self.generate_training_data()
             training_data = {"X": X, "Y":Y}
-            pickle.dump(training_data, open(self.dataset + ".training", "wb"))
+            pickle.dump(training_data, open(self.dataset + ".training.pickle", "wb"))
             return X, Y
 
     def train(self):
