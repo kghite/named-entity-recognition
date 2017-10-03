@@ -47,5 +47,7 @@ class Transition():
 
         return transitions
 
-t = Transition("eng.train")
-pp.pprint(t.load_or_calculate())
+
+if __name__ == "__main__":
+	t = Transition("eng.train")
+	pp.pprint(t.load_or_calculate())

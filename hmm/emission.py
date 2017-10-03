@@ -87,10 +87,14 @@ class Emitter():
             self.load_or_calculate()
         classes = self.model.predict_proba(word_data)[0]
         return {key: classes[self.symbol_indices[key]] for key in self.symbol_indices.keys()}
-        
-emitter = Emitter("eng.train")
-#emitter.train()
-print emitter.load_or_calculate()
-# w = WordVectors()
-# vec = w.load_wordvectors()
-# print emitter.emit([vec["Massachusetts"]])
+
+
+if __name__ == "__main__":        
+	emitter = Emitter("eng.train")
+	
+	#emitter.train()
+	print emitter.load_or_calculate()
+	
+	# w = WordVectors()
+	# vec = w.load_wordvectors()
+	# print emitter.emit([vec["Massachusetts"]])
