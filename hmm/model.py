@@ -1,30 +1,28 @@
 """
 Hidden Markov Model Implementation for Named Entity Recognition
 
-Model Requirements:
-	training set - 
-	test sequence
+See HiddenMarkovModel.md for process and data formats
 """
 
 # External imports
 import numpy as np
 import nltk
-import pickle
+import pickle, pprint
 import sys, os.path
+from timeit import default_timer
 
+# Internal imports
 sys.path.insert(0, '../')
 from data_util import Reader
 from vectors import WordVectors
-
-# Internal imports
 from transition import Transition
 from emission import Emitter
-# import decoder
+# from decoder import Decoder
 
+pp = pprint.PrettyPrinter(indent=2)
 
 
 class Model():
-
 
 	def __init__(self, training_set):
 		self.training_set = training_set
@@ -59,8 +57,6 @@ class Model():
 				else:
 					X.append([0]*300)
 					Y.append(word.tag)
-		X = np.array(X)
-		Y = np.array(Y)
 		return X, Y
 
 
@@ -74,14 +70,36 @@ class Model():
 		for word in text_tokens:
 			X.append(vec[word])
 
-		return np.array(X)			
+		return X			
 	
 
 	"""
 	Calulate the emission probs matrix for a given observation set
+	Provide progress bar b/c this takes a while
+	NOTE: Must run after tags have been pulled from t_probs
 	"""
-	def getEmissionProbs(self, sequence):
-		pass
+	def getEmissionProbs(self, observation_set):
+		e_probs = {}
+
+		# Add initial tag keys
+		for tag in self.tags:
+			e_probs[tag] = []
+
+		# Calculate e_prob for each word vector and update progress bar every 2%
+		total_words = len(observation_set)
+		print str(total_words) + " words"
+		for i in range(0, total_words):
+			# Get prob
+			probs = self.emitter.emit([observation_set[i]])
+			for tag in probs:
+				e_probs[tag].append(probs[tag])
+			# Update status bar
+			percentage = int((float(i) / float(total_words))*100)
+			bars = percentage / 2
+			space = 50 - bars
+			print '\r' + str(percentage) + "% [" + "|"*bars + " "*space + "]",
+
+		return e_probs
 
 
 	"""
@@ -94,34 +112,50 @@ class Model():
 	"""
 	Get the probabilities and run the decoder
 	Input: input_sequence - test data or plaintext to decode
-		   test - True if using tagged test data, default False
+		   test - True if using tagged test data, False if decoding plaintext
 				  Reports accuracy if using test data
 	"""
 	def run(self, input_sequence, test=True):
-		# Get transistion probs
+		# Get transistion probs and tags list
+		print "\nGenerating transition probabilites"
+		s = default_timer()
 		t_probs = self.transition.load_or_calculate()
-	
+		self.tags = t_probs.keys()	
+		e = default_timer()
+		print "DONE: " + str(e-s) + "s\n"
+
 		# Convert the input sequence to an observation set
+		print "Converting input to observation set"
+		s = default_timer()
 		if test:
-			observation_set, test_labels = generateTestObservations(input_sequence)
+			observation_set, test_labels = self.generateTestObservations(input_sequence)
 		else:
-			observation_set = generateTextObservations(input_sequence)
+			observation_set = self.generateTextObservations(input_sequence)
+		e = default_timer()
+		print "DONE: " + str(e-s) + "s\n" 
+
 
 		# Get emission probs
-		e_probs = self.getEmissionProbs(sequence)
+		print "Generating emission probabilities"
+		s = default_timer()
+		e_probs = self.getEmissionProbs(observation_set)
+		e = default_timer()
+		print "DONE: " + str(e-s) + "s\n"
 
 		# DEBUG: Probabilities
 		# print "Transition probabilities"
 		# print t_probs 
-		# print "Emission probabilities"
-		# print e_probs
+		print "Emission probabilities"
+		pp.pprint(e_probs)
 
 		# Run decoder 
 		# decoder = Decoder(self.tags, start_probs, e_probs, t_probs)
 		# decoded_states = decoder.decode(sequence)
 
+		# Report the accuracy of tests
 		if test:
-			getAccuracy(test_labels, decoded_states)
+			print "Calculating test accuracy"
+			self.getAccuracy(test_labels, decoded_states)
 
 		# decoder.print_decoded_states()
 		# decoder.print_dp_table()
@@ -139,4 +173,4 @@ if __name__ == "__main__":
 	# print Y[0]
 
 	print "Running model ..."
-	hmm.run("eng.testa")
+	hmm.run("eng.smalltesta")

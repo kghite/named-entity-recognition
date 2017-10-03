@@ -93,8 +93,7 @@ if __name__ == "__main__":
 	emitter = Emitter("eng.train")
 	
 	#emitter.train()
-	print emitter.load_or_calculate()
 	
-	# w = WordVectors()
-	# vec = w.load_wordvectors()
-	# print emitter.emit([vec["Massachusetts"]])
+	w = WordVectors()
+	vec = w.load_wordvectors()
+	print emitter.emit([vec["Massachusetts"]])

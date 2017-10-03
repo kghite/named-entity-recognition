@@ -23,11 +23,12 @@ test sequence -> start probs, get emission probs, decode
 						   ...					}
 				  ...							}
 	  ```
-* Emission Probabilities: Dictionary of tags mapped to dictionary of observation wordvecs mapped to their emission probability for that tag
+* Emission Probabilities: Dictionary of tags mapped to list of observation wordvec emission probabilities for that tag
 	* ```
 	  e_probs = { tag_1: { o_1: 0.23, o_2: 0.47, ... }
 				  ...								 }
 	  ``` 
+	* This is dependent on being able to track word order throughout decoding (list of emission probabilities for each tag rather than dictionary with wordvec keys) because wordvecs can't be hashed as a dictionary key in python
 
 *Output*
 
