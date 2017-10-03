@@ -110,7 +110,7 @@ class Model():
 		for i in range(0, len(test_labels)):
 			if decoded_labels[i] == test_labels[i]:
 				correct += 1
-		return float(correct)/float(len(test_labels))
+		return (float(correct)/float(len(test_labels))) * 100
 
 
 	"""
