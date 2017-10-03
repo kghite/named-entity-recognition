@@ -9,8 +9,6 @@ class Decoder():
 				key corresponding to a dictionary of prev tag
 				combos represented as "TAG TAG" with their 
 				respective transition probabilities
-	emis_probs: emission probabilities in a dictionary where each tag is a key
-			corresponding to a list of probs over the observation set
 	"""
 	def __init__(self, tags, start_probs, trans_probs):
 		self.tags = tags
@@ -49,15 +47,15 @@ class Decoder():
 				for prev_state_t1 in self.tags:
 					for prev_state_t2 in self.tags:
 						prev_states_tag = prev_state_t1 + ' ' + prev_state_t2
-						probs_to_max = self.V[i-1][prev_state_t1]['prob'] * trans_probs[state][prev_states_tag] 
+						probs_to_max = self.V[i-1][prev_state_t1]['prob'] * self.trans_probs[state][prev_states_tag] 
 				max_trans_prob = max(probs_to_max)
 				# Record the max transition prob in the dp matrix
 				for prev_state_t1 in self.tags:
 					for prev_state_t2 in self.tags:
 						prev_states_tag = prev_state_t1 + ' ' + prev_state_t2	
-						if self.V[i-1][prev_state]['prob'] * trans_probs[state][prev_states_tag] == max_trans_prob:
+						if self.V[i-1][prev_state]['prob'] * self.trans_probs[state][prev_states_tag] == max_trans_prob:
 							max_prob = max_trans_prob * emis_probs[state][seq[i]]
-							self.V[i][state] = {'prob': max_prob, 'prev_state' = prev_state_t1} 
+							self.V[i][state] = {'prob': max_prob, 'prev_state': prev_state_t1} 
 							break
 
 		# Get the highest prob

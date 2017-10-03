@@ -17,7 +17,7 @@ from data_util import Reader
 from vectors import WordVectors
 from transition import Transition
 from emission import Emitter
-# from decoder import Decoder
+from decoder import Decoder
 
 pp = pprint.PrettyPrinter(indent=2)
 
@@ -134,30 +134,33 @@ class Model():
 		e = default_timer()
 		print "DONE: " + str(e-s) + "s\n" 
 
-
 		# Get emission probs
 		print "Generating emission probabilities"
 		s = default_timer()
 		e_probs = self.getEmissionProbs(observation_set)
 		e = default_timer()
-		print "DONE: " + str(e-s) + "s\n"
+		print "DONE: " + str(e-s) + "s\n"		
 
 		# DEBUG: Probabilities
 		# print "Transition probabilities"
-		# print t_probs 
-		print "Emission probabilities"
-		pp.pprint(e_probs)
+		# pp.pprint(t_probs) 
+		# print "Emission probabilities"
+		# pp.pprint(e_probs)
 
-		# Run decoder 
-		# decoder = Decoder(self.tags, start_probs, e_probs, t_probs)
-		# decoded_states = decoder.decode(sequence)
+		# Run decoder with even start probabilities
+		start_probs = {}
+		even_prob = 1.0 / len(tags)
+		for tag in self.tags:
+			start_probs[tag] = even_prob
+		decoder = Decoder(self.tags, start_probs, e_probs)
+		decoded_states = decoder.decode(sequence)
 
 		# Report the accuracy of tests
 		if test:
 			print "Calculating test accuracy"
 			self.getAccuracy(test_labels, decoded_states)
 
-		# decoder.print_decoded_states()
+		decoder.print_decoded_states()
 		# decoder.print_dp_table()
 
 
