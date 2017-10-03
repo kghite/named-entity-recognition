@@ -106,7 +106,11 @@ class Model():
 	Calculate accuracy of the decoded predictions compared to the tags
 	"""
 	def getAccuracy(self, test_labels, decoded_labels):
-		pass
+		correct = 0
+		for i in range(0, len(test_labels)):
+			if decoded_labels[i] == test_labels[i]:
+				correct += 1
+		return float(correct)/float(len(test_labels))
 
 
 	"""
@@ -149,19 +153,20 @@ class Model():
 
 		# Run decoder with even start probabilities
 		start_probs = {}
-		even_prob = 1.0 / len(tags)
+		even_prob = 1.0 / len(self.tags)
 		for tag in self.tags:
 			start_probs[tag] = even_prob
-		decoder = Decoder(self.tags, start_probs, e_probs)
-		decoded_states = decoder.decode(sequence)
+		decoder = Decoder(self.tags, start_probs, t_probs)
+		decoded_states = decoder.decode(observation_set, e_probs)
 
 		# Report the accuracy of tests
 		if test:
 			print "Calculating test accuracy"
-			self.getAccuracy(test_labels, decoded_states)
+			acc = self.getAccuracy(test_labels, decoded_states)
+			print str(acc) + "% accurate to test labels"
 
 		decoder.print_decoded_states()
-		# decoder.print_dp_table()
+		decoder.print_dp_table()
 
 
 
