@@ -1,8 +1,10 @@
 import os.path
 import sys
 import pickle
+import pprint
 
 sys.path.insert(0, '../')
+pp = pprint.PrettyPrinter(indent=2)	
 
 from data_util import Reader 
 
@@ -45,7 +47,5 @@ class Transition():
 
         return transitions
 
-'''
 t = Transition("eng.train")
-print t.load_or_calculate()
-'''
+pp.pprint(t.load_or_calculate())

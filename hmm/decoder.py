@@ -3,7 +3,7 @@ import numpy as np
 class Decoder():
 
 	"""
-	tags: list of 6 possible states -> ["ORG" "MISC" "PER" "O" "LOC" "<START>"]
+	tags: list of possible states
 	start_probs: the initial probabilities for each tag in a dictionary
 	trans_probs: transition probabilities in dictionary where each tag is a 
 				key corresponding to a dictionary of prev tag
@@ -12,11 +12,10 @@ class Decoder():
 	emis_probs: emission probabilities in a dictionary where each tag is a key
 			corresponding to a list of probs over the observation set
 	"""
-	def __init__(self, tags, start_probs,  trans_probs, emis_probs):
+	def __init__(self, tags, start_probs, trans_probs):
 		self.tags = tags
 		self.start_probs = start_probs
 		self.trans_prob = trans_prob
-		self.emis_probs = emis_probs
 		# Init dp matrix
 		self.V = []
 		self.max_prob = 0.0
@@ -26,9 +25,10 @@ class Decoder():
 
 	"""
 	Viterbi Implementation	
-	Returns:
+	Input: seq - sequence of word vecs to decode
+		   emis_probs - emission probabilities generated for the given sequence
 	"""
-	def decode(self, seq):
+	def decode(self, seq, emis_probs):
 		# Check that we actually got the sequence
 		seq_len = len(seq)
 		if seq_len == 0:
@@ -37,7 +37,7 @@ class Decoder():
 		# Init tag deltas
 		deltas = {}
 		for state in self.tags:
-			deltas[tag] = {'prob': self.start_probs[tag] * self.emis_probs[tag][0], 'prev': None}
+			deltas[tag] = {'prob': self.start_probs[tag] * emis_probs[tag][seq[0]], 'prev': None}
 		self.V.append(deltas)		
 
 		# Run Viterbi over the length of the observation set
@@ -72,6 +72,8 @@ class Decoder():
 		# Trace back to create the output state set
 		for i in range(len(self.V)-2, -1, -1):
 			self.state_output.insert(0, self.V[i+1][prev]['prev']
+		
+		return self.state_output
 
 
 	"""

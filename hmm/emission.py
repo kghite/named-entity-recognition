@@ -90,6 +90,7 @@ class Emitter():
         
 emitter = Emitter("eng.train")
 #emitter.train()
-w = WordVectors()
-vec = w.load_wordvectors()
-print emitter.emit([vec["Massachusetts"]])
+print emitter.load_or_calculate()
+# w = WordVectors()
+# vec = w.load_wordvectors()
+# print emitter.emit([vec["Massachusetts"]])
