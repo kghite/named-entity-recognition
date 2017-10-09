@@ -33,7 +33,7 @@ class Decoder():
 			return []
 
 		# Add the initial two wordvec predictions as the emission probs b/c no prior wordvecs to use
-		initals = {}
+		initials = {}
 		for state in self.tags:
 			initials[state] = {'prob': self.start_probs[state] * emis_probs[state][0], 'prev_state': None}
 		self.V.append(initials)		
@@ -50,7 +50,7 @@ class Decoder():
 						t_prob = self.trans_probs[state][prev_tag]
 					else:
 						t_prob = 0.0
-					probs_given_prev.append(self.V[i-1][prev_tag]['prob']) * t_prob) 
+					probs_given_prev.append(self.V[i-1][prev_tag]['prob'] * t_prob) 
 				max_trans_prob = max(probs_given_prev)
 				# Figure out which tag pair had the max prob and then store in the dp matrix
 				for prev_tag in self.tags:			
@@ -58,7 +58,7 @@ class Decoder():
 						t_prob = self.trans_probs[state][prev_tag]
 					else:
 						t_prob = 0.0
-					tags_prob = (self.V[i-2][prev_tags[0]]['prob'] + self.V[i-1][prev_tags[1]]['prob']) * t_prob
+					tags_prob = (self.V[i-1][prev_tag]['prob'] * t_prob)
 					if tags_prob == max_trans_prob:
 							max_prob = max_trans_prob * emis_probs[state][i]
 							self.V[i][state] = {'prob': max_prob, 'prev_state': prev_tag} 

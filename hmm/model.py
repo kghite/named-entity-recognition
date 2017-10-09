@@ -17,7 +17,7 @@ from data_util import Reader
 from vectors import WordVectors
 from transition import Transition
 from emission import Emitter
-from decoder import Decoder
+from decoder_1back import Decoder
 
 pp = pprint.PrettyPrinter(indent=2)
 
