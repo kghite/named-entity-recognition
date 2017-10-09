@@ -5,7 +5,6 @@ import numpy as np
 from sklearn.ensemble import BaggingClassifier
 from sklearn.multiclass import OneVsRestClassifier
 from sklearn.svm import SVC
-
 sys.path.insert(0, '../')
 
 from data_util import Reader
