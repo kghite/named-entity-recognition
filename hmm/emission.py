@@ -5,7 +5,6 @@ import numpy as np
 from sklearn.ensemble import BaggingClassifier
 from sklearn.multiclass import OneVsRestClassifier
 from sklearn.svm import SVC
-
 sys.path.insert(0, '../')
 
 from data_util import Reader
@@ -90,10 +89,14 @@ class Emitter():
 
 
 if __name__ == "__main__":        
-	emitter = Emitter("eng.train")
-	
-	#emitter.train()
-	
-	w = WordVectors()
-	vec = w.load_wordvectors()
-	print emitter.emit([vec["Massachusetts"]])
+    emitter = Emitter("eng.train")
+    #emitter.train()
+    w = WordVectors()
+    vec = w.load_wordvectors()
+    resp = "y"
+    while resp != "n":
+        resp = raw_input("Word: ")
+        if resp in vec:
+            print emitter.emit([vec[resp]])
+        else:
+            print emitter.emit([[0]*300])

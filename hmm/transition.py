@@ -13,12 +13,12 @@ class Transition():
         self.dataset = dataset
 
     def load_or_calculate(self):
-        if os.path.isfile(self.dataset + ".pickle"):
-            return pickle.load(open(self.dataset + ".pickle", "rb"))
+        if os.path.isfile(self.dataset + ".transition.pickle"):
+            return pickle.load(open(self.dataset + ".transition.pickle", "rb"))
         r = Reader(self.dataset)
         words = r.process_words()
         transitions = self.calculate_transition_probability(words)
-        pickle.dump(transitions, open(self.dataset + ".pickle", "wb"))
+        pickle.dump(transitions, open(self.dataset + ".transition.pickle", "wb"))
         return transitions
 
     def calculate_transition_probability(self, words):
@@ -33,20 +33,16 @@ class Transition():
     def count_transitions(self, words):
         transitions = {}
         for line in words:
-            n_2 = "<START>"
             n_1 = "<START>"
             for full_word in line:
                 n = full_word.tag
                 n_transitions = transitions.get(n, {})
-                bigram = "{} {}".format(n_2, n_1)
-                transition_count = n_transitions.get(bigram, 0)
-                n_transitions[bigram] = transition_count + 1
+                transition_count = n_transitions.get(n_1, 0)
+                n_transitions[n_1] = transition_count + 1
                 transitions[n] = n_transitions
-                n_2 = n_1
                 n_1 = n
 
         return transitions
-
 
 if __name__ == "__main__":
 	t = Transition("eng.train")
