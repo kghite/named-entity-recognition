@@ -146,10 +146,10 @@ class Model():
 		print "DONE: " + str(e-s) + "s\n"		
 
 		# DEBUG: Probabilities
-		# print "Transition probabilities"
-		# pp.pprint(t_probs) 
-		# print "Emission probabilities"
-		# pp.pprint(e_probs)
+		print "Transition probabilities"
+		pp.pprint(t_probs) 
+		print "Emission probabilities"
+		pp.pprint(e_probs)
 
 		# Run decoder with even start probabilities
 		start_probs = {}
@@ -166,7 +166,9 @@ class Model():
 			print str(acc) + "% accurate to test labels"
 
 		decoder.print_decoded_states()
-		decoder.print_dp_table()
+		table_gen = decoder.print_dp_table()
+		for i in table_gen:
+			print i
 
 
 
