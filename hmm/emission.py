@@ -87,6 +87,12 @@ class Emitter():
         classes = self.model.predict_proba(word_data)[0]
         return {key: classes[self.symbol_indices[key]] for key in self.symbol_indices.keys()}
 
+    def emit_batch(self, word_data):
+        if self.model is None:
+            print "No model loaded, doing it now..."
+            self.load_or_calculate()
+        classes = self.model.predict_proba(word_data)
+        return [{key: c[self.symbol_indices[key]] for key in self.symbol_indices.keys()} for c in classes]
 
 if __name__ == "__main__":        
     emitter = Emitter("eng.train")
@@ -97,6 +103,6 @@ if __name__ == "__main__":
     while resp != "n":
         resp = raw_input("Word: ")
         if resp in vec:
-            print emitter.emit([vec[resp]])
+            print emitter.emit_batch([vec[resp], vec[resp]])
         else:
             print emitter.emit([[0]*300])
