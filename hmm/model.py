@@ -88,16 +88,22 @@ class Model():
 		# Calculate e_prob for each word vector and update progress bar every 2%
 		total_words = len(observation_set)
 		print str(total_words) + " words"
-		for i in range(0, total_words):
+		# for i in range(0, total_words):
 			# Get prob
-			probs = self.emitter.emit([observation_set[i]])
-			for tag in probs:
-				e_probs[tag].append(probs[tag])
+			# probs = self.emitter.emit([observation_set[i]])
+			# for tag in probs:
+				# e_probs[tag].append(probs[tag])
 			# Update status bar
-			percentage = int((float(i) / float(total_words))*100)
-			bars = percentage / 2
-			space = 50 - bars
-			print '\r' + str(percentage) + "% [" + "|"*bars + " "*space + "]",
+			# percentage = int((float(i) / float(total_words))*100)
+			# bars = percentage / 2
+			# space = 50 - bars
+			# print '\r' + str(percentage) + "% [" + "|"*bars + " "*space + "] " + str(i),
+		
+		probs = self.emitter.emit_batch(observation_set)
+
+		for i in range(0, total_words):
+			for tag in probs[i]:
+				e_probs[tag].append(probs[i][tag])
 
 		return e_probs
 
@@ -111,6 +117,39 @@ class Model():
 			if decoded_labels[i] == test_labels[i]:
 				correct += 1
 		return (float(correct)/float(len(test_labels))) * 100
+
+
+	"""
+	Create the confusion matrix for the decoded predictions compared to the tags
+	confusion = {tag1: {tag1: 0, tag2: 0 ...},
+		     tag2: {...}}
+	confusion tracks the tag confusion counts and then converts to tag accuracies
+	"""
+	def getConfusionMatrix(self, test_labels, decoded_labels):
+		# Init confusion dict
+		confusion = {}
+		tag_counts = {}
+		for tag in self.tags:
+			tag_counts[tag] = 0
+		for tag in self.tags:
+			confusion[tag] = tag_counts.copy()
+		
+		# Run through the output list to prevent running over tags multiple times
+		for i in range(0, len(test_labels)):
+			# Create a list of the confusion accuracies for each tag
+			true_tag = test_labels[i]
+			decoded_tag = decoded_labels[i]
+			confusion[true_tag][decoded_tag] += 1
+
+		# Convert the counts to accuracy percentages
+		for tag in self.tags:
+			# Count how many times the tag occurs in the test sequence
+			true_count = test_labels.count(tag)
+			if true_count != 0: # If there were no true instances, there won't be any counts
+				for count_tag in self.tags:
+					confusion[tag][count_tag] = float(confusion[tag][count_tag]) / float(true_count) 		
+		
+		return confusion
 
 
 	"""
@@ -146,10 +185,10 @@ class Model():
 		print "DONE: " + str(e-s) + "s\n"		
 
 		# DEBUG: Probabilities
-		print "Transition probabilities"
-		pp.pprint(t_probs) 
-		print "Emission probabilities"
-		pp.pprint(e_probs)
+		# print "Transition probabilities"
+		# pp.pprint(t_probs) 
+		# print "Emission probabilities"
+		# pp.pprint(e_probs)
 
 		# Run decoder with even start probabilities
 		start_probs = {}
@@ -164,11 +203,15 @@ class Model():
 			print "Calculating test accuracy"
 			acc = self.getAccuracy(test_labels, decoded_states)
 			print str(acc) + "% accurate to test labels"
+			print "Calculating confusion matrix"
+			conf = self.getConfusionMatrix(test_labels, decoded_states)
+			pp.pprint(conf)
 
-		decoder.print_decoded_states()
-		table_gen = decoder.print_dp_table()
-		for i in table_gen:
-			print i
+		# DEBUG: DP Table
+		# decoder.print_decoded_states()
+		# table_gen = decoder.print_dp_table()
+		# for i in table_gen:
+			# print i
 
 
 
@@ -183,4 +226,4 @@ if __name__ == "__main__":
 	# print Y[0]
 
 	print "Running model ..."
-	hmm.run("eng.smalltesta")
+	hmm.run("eng.testbsmall")

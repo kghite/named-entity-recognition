@@ -2,7 +2,7 @@ import gensim
 
 class WordVectors():
     def load_wordvectors(self):
-        return gensim.models.KeyedVectors.load_word2vec_format('../GoogleNews-vectors-negative300.bin', binary=True)
+        return gensim.models.Word2Vec.load_word2vec_format('/data2/user_data/khite/ner_data/GoogleNews-vectors-negative300.bin', binary=True)
 
 '''
 w = WordVectors()

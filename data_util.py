@@ -1,6 +1,6 @@
 class Reader():
     def __init__(self, filename):
-        self.filename = "../corpus/" + filename
+        self.filename = "/data2/user_data/khite/ner_data/" + filename
         self.IGNORE_WORD = "-X-"
 
     def process_words(self):
