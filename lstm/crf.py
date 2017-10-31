@@ -56,7 +56,7 @@ class CRF():
                 minimize = optimizer.minimize(loss)
             except ValueError:
                 with tf.variable_scope(tf.get_variable_scope(), reuse=True):
-                    optimizer = tf.train.AdamOptimizer(learning_rate=self.config.learning_rate)
+                    optimizer = tf.train.GradientDescentOptimizer(learning_rate=self.config.learning_rate)
                     minimize = optimizer.minimize(loss)
             return minimize
 
