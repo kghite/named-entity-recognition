@@ -1,29 +1,32 @@
+import sys
 import tensorflow as tf
 
 from config import *
+sys.path.insert(0, '../')
+
+from data_util import Reader
+from vectors import WordVectors
 
 class DataStream():
     def __init__(self, config):
         self.config = config
         self.counter = 0
-        self.stop = 10
+        r = Reader("eng.train")
+        self.lines = r.process_words()
+        w = WordVectors()
+        self.vec = w.load_wordvectors()
 
     def has_next(self):
-        return self.counter < self.stop 
+        return self.counter < 10 
 
     def next_data(self):
-        self.counter += 1
-        fake_context_reps = tf.random_normal(
-                shape=[1, self.config.context_size, 5],
-                mean=10,
-                stddev=5,
-                dtype=tf.float32)
-        fake_labels = tf.random_normal(
-                shape=[1, 5],
-                mean = (self.config.ntags/2),
-                stddev=1,
-                dtype=tf.float32)
-        return fake_context_reps, fake_labels
+        labels = [self.config.tag_indices[word.tag] for word in self.lines[self.counter]]
+        embeddings = [self.vec[word.word].tolist() if word.word in self.vec else [0] * self.config.context_size for word in self.lines[self.counter]]
+        print "Labels {}".format(labels)
+        self.counter += 1 
+        tf_embeddings = tf.convert_to_tensor(embeddings, dtype=tf.float32)
+        tf_labels = tf.convert_to_tensor([labels], dtype=tf.float32)
+        return tf_embeddings, tf_labels
 
     def reset(self):
         self.counter = 0

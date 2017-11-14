@@ -3,3 +3,4 @@ GoogleNews-vectors-negative300.bin
 *.pyc
 *.swp
 hmm_files.zip
+model.ckpt.*
