@@ -17,15 +17,18 @@ class DataStream():
         self.vec = w.load_wordvectors()
 
     def has_next(self):
-        return self.counter < 10 
+        return self.counter < len(self.lines)
 
     def next_data(self):
         labels = [self.config.tag_indices[word.tag] for word in self.lines[self.counter]]
+
+        # List of list of word embeddings n x 300
         embeddings = [self.vec[word.word].tolist() if word.word in self.vec else [0] * self.config.context_size for word in self.lines[self.counter]]
-        print "Labels {}".format(labels)
-        self.counter += 1 
+        # Katie put this in the thing n x 300 as a tensor
         tf_embeddings = tf.convert_to_tensor(embeddings, dtype=tf.float32)
+        
         tf_labels = tf.convert_to_tensor([labels], dtype=tf.float32)
+        self.counter += 1
         return tf_embeddings, tf_labels
 
     def reset(self):
