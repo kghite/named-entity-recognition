@@ -19,8 +19,6 @@ class CRF():
         if not has_loaded:
             data_stream.reset()
             self.train(data_stream)
-        else:
-            self.trans_params = pickle.load(open("trans_params.model.pickle", "rb"))["trans_params"] 
 
     def predict(self, word_reps):
         with tf.variable_scope(tf.get_variable_scope(), reuse=True):
@@ -32,7 +30,6 @@ class CRF():
         for x in range(self.config.number_of_epochs):
             self.run_epoch(data_stream)
         self.config.save_model()
-        pickle.dump({"trans_params":self.trans_params}, open("trans_params.model.pickle", "wb"))
 
     def initialize_vars(self):
         uninit_vars = []
