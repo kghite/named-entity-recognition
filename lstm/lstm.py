@@ -32,7 +32,7 @@ class ContextEmbeddings():
 
 		# 2. put the time dimension on axis=1 for dynamic_rnn
 		s = tf.shape(char_embeddings) # store old shape
-		(batch x sentence, word, dim of char embeddings)
+		# shape = (batch, x, sentence, word, dim of char embeddings)
 		char_embeddings = tf.reshape(char_embeddings, shape=[-1, s[-2], s[-1]])
 		word_lengths = tf.reshape(self.word_lengths, shape=[-1])
 
@@ -58,3 +58,7 @@ class ContextEmbeddings():
     						dtype=tf.float32)
 
 		context_rep = tf.concat([output_fw, output_bw], axis=-1)
+
+
+if __name__ == '__main__':
+	ce = ContextEmbeddings()
